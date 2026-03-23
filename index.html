@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>WikImage — Uncyclopedia & Commons Image Search</title>
+<title>WikImage</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet">
@@ -39,8 +39,6 @@
     min-height: 100vh;
     overflow-x: hidden;
   }
-
-  /* ── Noise overlay ── */
   body::before {
     content: '';
     position: fixed;
@@ -50,14 +48,12 @@
     z-index: 9999;
   }
 
-  /* ── Layout ── */
   .app {
     max-width: 1280px;
     margin: 0 auto;
     padding: 40px 24px 80px;
   }
 
-  /* ── Header ── */
   .header {
     text-align: center;
     margin-bottom: 48px;
@@ -83,7 +79,6 @@
     letter-spacing: 0.04em;
   }
 
-  /* ── Search bar ── */
   .search-area {
     max-width: 680px;
     margin: 0 auto 20px;
@@ -140,8 +135,7 @@
     opacity: 0.5;
     cursor: not-allowed;
   }
-
-  /* ── Source toggles ── */
+  
   .source-toggles {
     display: flex;
     justify-content: center;
@@ -190,7 +184,6 @@
   }
   .source-toggle.active[data-source="commons"] .dot { opacity: 1; }
 
-  /* ── Options row ── */
   .options-row {
     display: flex;
     justify-content: center;
@@ -224,7 +217,6 @@
     border-color: var(--accent);
   }
 
-  /* ── Status ── */
   .status {
     text-align: center;
     color: var(--text-dim);
@@ -242,7 +234,6 @@
     color: var(--danger);
   }
 
-  /* ── Loader ── */
   .loader {
     display: none;
     justify-content: center;
@@ -268,7 +259,6 @@
     40% { transform: scale(1); opacity: 1; }
   }
 
-  /* ── Results grid ── */
   .results {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -370,7 +360,6 @@
     color: var(--text-dim);
   }
 
-  /* ── Modal overlay ── */
   .modal-overlay {
     display: none;
     position: fixed;
@@ -515,7 +504,6 @@
     transform: translateX(-50%) translateY(0);
   }
 
-  /* ── Empty state ── */
   .empty-state {
     text-align: center;
     padding: 80px 20px;
@@ -535,7 +523,6 @@
     line-height: 1.6;
   }
 
-  /* ── Load more ── */
   .load-more-wrap {
     text-align: center;
     margin-top: 32px;
@@ -562,7 +549,6 @@
     color: var(--accent);
   }
 
-  /* ── Responsive ── */
   @media (max-width: 640px) {
     .logo { font-size: 2.2rem; }
     .results { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
@@ -576,8 +562,8 @@
 
 <div class="app">
   <div class="header">
-    <div class="logo">Wik<span>Image</span></div>
-    <div class="subtitle">Search images on Uncyclopedia &amp; Wikimedia Commons</div>
+    <div class="logo">Wikimedia<span>ImageFinder</span></div>
+    <div class="subtitle">Tired of trying to find images? Sick of the old "File:xyz" nonsense leading to nothing because someone named their image of the ocean "Beans.jpg?" Then this is the tool for you</div>
   </div>
 
   <div class="search-area">
@@ -586,7 +572,7 @@
         <span class="dot"></span> Uncyclopedia
       </button>
       <button class="source-toggle active" data-source="commons" onclick="toggleSource(this)">
-        <span class="dot"></span> Wikimedia Commons
+        <span class="dot"></span> Wikimedia
       </button>
     </div>
 
@@ -619,7 +605,7 @@
 
   <div class="results" id="results"></div>
   <div class="empty-state" id="emptyState">
-    <div class="icon">🖼</div>
+    <div class="icon">.img</div>
     <p>Type a keyword to search for images across Uncyclopedia and Wikimedia Commons. Results will show thumbnails and wikitext to copy.</p>
   </div>
 
@@ -628,7 +614,6 @@
   </div>
 </div>
 
-<!-- Modal -->
 <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
   <div class="modal" id="modal">
     <div class="modal-img-wrap">
@@ -645,22 +630,19 @@
 <div class="copied-toast" id="copiedToast">Copied to clipboard!</div>
 
 <script>
-// ── API endpoints ──
+
 const APIS = {
   uncyclopedia: 'https://en.uncyclopedia.co/w/api.php',
   commons: 'https://commons.wikimedia.org/w/api.php'
 };
 
-// ── State ──
 let allResults = [];
 let continueTokens = { uncyclopedia: null, commons: null };
 let currentQuery = '';
 let isLoading = false;
 
-// ── Source toggles ──
 function toggleSource(btn) {
   btn.classList.toggle('active');
-  // Ensure at least one is active
   const actives = document.querySelectorAll('.source-toggle.active');
   if (actives.length === 0) btn.classList.add('active');
 }
@@ -670,7 +652,6 @@ function getActiveSources() {
     .map(b => b.dataset.source);
 }
 
-// ── Search ──
 document.getElementById('searchInput').addEventListener('keydown', e => {
   if (e.key === 'Enter') doSearch();
 });
@@ -723,7 +704,6 @@ async function doSearch() {
 
   renderResults(allResults);
 
-  // Show load-more if any source has continue tokens
   const hasMore = sources.some(s => continueTokens[s]);
   if (hasMore) document.getElementById('loadMoreWrap').classList.add('active');
 }
@@ -752,7 +732,6 @@ async function fetchImages(source, query, limit, sort, isContinue = false) {
   const items = [];
 
   try {
-    // Step 1: Search for files in namespace 6
     const searchParams = new URLSearchParams({
       action: 'query',
       list: 'search',
@@ -779,7 +758,6 @@ async function fetchImages(source, query, limit, sort, isContinue = false) {
       return items;
     }
 
-    // Save continue token
     if (searchData.continue && searchData.continue.sroffset) {
       continueTokens[source] = searchData.continue.sroffset;
     } else {
@@ -788,7 +766,6 @@ async function fetchImages(source, query, limit, sort, isContinue = false) {
 
     const titles = searchData.query.search.map(s => s.title);
 
-    // Step 2: Get image info in batches of 50
     for (let i = 0; i < titles.length; i += 50) {
       const batch = titles.slice(i, i + 50);
       const infoParams = new URLSearchParams({
@@ -808,7 +785,6 @@ async function fetchImages(source, query, limit, sort, isContinue = false) {
         for (const [pid, page] of Object.entries(infoData.query.pages)) {
           if (page.imageinfo && page.imageinfo.length > 0) {
             const ii = page.imageinfo[0];
-            // Filter to actual images
             if (ii.mime && ii.mime.startsWith('image/')) {
               items.push({
                 source: source,
@@ -840,8 +816,7 @@ async function fetchImages(source, query, limit, sort, isContinue = false) {
   allResults = allResults.concat(items);
   return items;
 }
-
-// ── Render ──
+  
 function renderResults(items) {
   const grid = document.getElementById('results');
   grid.innerHTML = '';
@@ -876,7 +851,6 @@ function renderResults(items) {
   });
 }
 
-// ── Modal ──
 function openModal(item) {
   document.getElementById('modalImg').src = item.thumbUrl || item.url;
   document.getElementById('modalTitle').textContent = item.name;
@@ -928,14 +902,12 @@ document.addEventListener('keydown', e => {
   }
 });
 
-// ── Clipboard ──
 function copyText(text) {
   navigator.clipboard.writeText(text).then(() => {
     const toast = document.getElementById('copiedToast');
     toast.classList.add('show');
     setTimeout(() => toast.classList.remove('show'), 1800);
   }).catch(() => {
-    // Fallback
     const ta = document.createElement('textarea');
     ta.value = text;
     document.body.appendChild(ta);
@@ -948,7 +920,6 @@ function copyText(text) {
   });
 }
 
-// ── Helpers ──
 function showLoader(show) {
   isLoading = show;
   document.getElementById('loader').classList.toggle('active', show);
